@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Justin Ridgewell</string>
 	<key>Builder Version</key>
-	<string>8536.26.14</string>
+	<string>8536.29.13</string>
 	<key>CFBundleDisplayName</key>
 	<string>Resizer</string>
 	<key>CFBundleIdentifier</key>
@@ -67,7 +67,7 @@
 		</dict>
 	</dict>
 	<key>Description</key>
-	<string>Resize the browser based on CSS defined media queries. Forked from ResponsiveResize http://www.midwinter-dg.com/downloads_safari-extension_responsive-resize.html</string>
+	<string>Resize the browser based on CSS defined media queries</string>
 	<key>ExtensionInfoDictionaryVersion</key>
 	<string>1.0</string>
 	<key>Permissions</key>
