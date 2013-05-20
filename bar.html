@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Resizer</title>
+
+		<link rel="stylesheet" href="styles.css" type="text/css">
+		<script type="text/javascript">
+			var scrollBar = 0;
+			//detect lower than Safari 6...
+			if (!safari.application.privateBrowsing) {
+				scrollBar = 15;
+			}
+
+			var emSize = 16;
+			var loaded = false;
+			const myGlobal = safari.extension.globalPage.contentWindow,
+				resizerMenu = myGlobal.resizerMenu;
+
+			function resizeWindow(width) {
+				var em = (width.indexOf('em') != -1);
+				width = parseFloat(width, 10);
+				if (em) {
+					width = width * emSize;
+				}
+
+				window.self.resizeTo(width + scrollBar, screen.availHeight);
+			}
+
+			function resizeMinus1() {
+				window.self.resizeTo(window.innerWidth - 1, screen.availHeight);
+			}
+
+			function resizePlus1() {
+				window.self.resizeTo(window.innerWidth + 1, screen.availHeight);
+			}
+
+			function resizeFullScreen() {
+				window.self.resizeTo(screen.availWidth, screen.availHeight);
+			}
+
+			function resizeCustom() {
+				resizeWindow(document.getElementById('custom').value);
+			}
+			
+
+			function createButton(width) {
+				var button = document.createElement('button');
+				button.setAttribute('type', 'button');
+				button.setAttribute('onclick', 'resizeWindow(\'' + width + '\')');
+				button.textContent = width;
+				// button = '<button type="button" onclick="resizeWindow(\'' + width + '\')">' + width + '</button>';
+
+				return button;
+			}
+
+			function updateButtons(data) {
+				if (!data.length) {
+					data = [{
+						1: '320px',
+						2: '480px',
+						3: '640px',
+						4: '768px',
+						5: '960px',
+						6: '1024px',
+						7: '1136px',
+						8: '1536px',
+						9: '2048px'
+					}];
+				}
+				
+				var buttons = [],
+					buttonsDiv = document.getElementById('buttons'),
+					button,
+					data;
+
+				for (var i = buttonsDiv.childElementCount - 1; i >= 0; --i) {
+					buttonsDiv.removeChild(buttonsDiv.children[i]);
+					if (!resizerMenu.visible) {
+						resizerMenu.removeMenuItem(i);
+					}
+				}
+
+				for (var i = 0; i < data.length; ++i) {
+					var d = data[i];
+					for (var j in d) {
+						if (d[j] != null) {
+							buttons.push(createButton(d[j]));
+							if (!resizerMenu.visible) {
+								resizerMenu.appendMenuItem(d[j], d[j], 'resizeWindow');
+							}
+						}
+					}
+				}
+				if (!resizerMenu.visible) {
+					resizerMenu.appendSeparator();
+					resizerMenu.appendMenuItem('-1px', '-1px', 'resizeMinus1');
+					resizerMenu.appendMenuItem('+1px', '+1px', 'resizePlus1');
+					resizerMenu.appendMenuItem('fullscreen', 'Full Screen', 'resizeFullScreen');
+				}
+
+				for (var i = 0; i < buttons.length; ++i) {
+					buttonsDiv.appendChild(buttons[i]);
+					// buttonsDiv.innerHTML = buttons.join('');
+				}
+
+				// Fix slight graphic errors when changing dom
+				var h = document.getElementsByClassName('bar')[0].style.height;
+				document.getElementsByTagName('body')[0].style.height = '31px';
+				document.getElementsByTagName('body')[0].style.height = h;
+			}
+
+			function respondToMessage(theMessageEvent) {
+				if (!loaded) {
+					if (theMessageEvent.target != safari.application.activeBrowserWindow.activeTab) {
+						return;
+					}
+				}
+				
+				if(theMessageEvent.name === 'updateButtons') {
+					updateButtons(theMessageEvent.message)
+				} else if (theMessageEvent.name === 'emSize') {
+					emSize = parseFloat(theMessageEvent.message, 10);
+				}
+			}
+
+			function activateHandler(handlerEvent) {
+				if (handlerEvent.type == 'activate') {
+					loaded = true;
+					handlerEvent.target.page.dispatchMessage('update', true);
+				}
+			}
+			
+			var tabs = safari.application.activeBrowserWindow.tabs;
+			for (var i = 0; i < tabs.length; ++i) {
+				tabs[i].addEventListener('activate', activateHandler, false);
+			}
+			safari.application.addEventListener('message', respondToMessage, false);
+			// safari.application.activeBrowserWindow.activeTab.page.dispatchMessage('update', true);
+			
+			// Menu things...
+			// safari.application.addEventListener('validate', validateHandler, true);
+			// safari.application.addEventListener('menu', menuHandler, true);
+			// safari.application.addEventListener('command', commandHandler, true);
+		</script>
+	</head>
+	<body>
+		<div class="bar">
+			<div id="buttons">
+				<!-- <button type="button" onclick="resizeWindow('320px')">320px</button> -->
+			</div>
+			
+			<div id="otherbuttons">
+				<div class="divider"></div>
+
+				<input type="text" id="custom" placeholder="custom" name="custom" value="">
+				<button type="button" class="resize" onclick="resizeCustom();">resize</button>
+				<div class="divider"></div>
+
+				<button type="button" id="minus1" onclick="resizeMinus1()">-1px</button>
+				<button type="button" id="plus1" onclick="resizePlus1()">+1px</button>
+				<button type="button" onclick="resizeFullScreen()">Full Screen</button>
+			</div>
+		</div>
+	</body>
+</html>

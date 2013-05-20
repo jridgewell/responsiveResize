@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<!-- /*
+ * Forked from ResponsiveResize
+ * http://www.midwinter-dg.com/downloads_safari-extension_responsive-resize.html
+ */ -->
+	<head>
+		<meta charset="utf-8" />
+		<title>Resizer</title>
+
+		<script type="text/javascript">
+			var resizerBar,
+				resizerToolBar,
+				resizerMenu;
+			const bars = safari.extension.bars,
+				toolbars = safari.extension.toolbarItems,
+				menus = safari.extension.menus,
+				activeBrowserWindow = safari.application.activeBrowserWindow;
+				
+			for (var i = 0;i < bars.length; ++i) {
+				var bar = bars[i];
+				if (bar.browserWindow == activeBrowserWindow && bar.identifier == 'resizerButtonBar') {
+					resizerBar = bar;
+				}
+			}
+			for (var i = 0;i < toolbars.length; ++i) {
+				var toolbar = toolbars[i];
+				if (toolbar.browserWindow == activeBrowserWindow && toolbar.identifier == 'resizerToolbar') {
+					resizerToolBar = toolbar;
+				}
+			}
+			for (var i = 0;i < menus.length; ++i) {
+				var menu = menus[i];
+				if (menu.identifier == 'resizerMenu') {
+					resizerMenu = menu;
+				}
+			}
+			
+			if (resizerToolBar && resizerMenu) {
+				resizerToolBar.menu = resizerMenu;
+			}
+
+				
+			safari.application.addEventListener('command', performCommand, true);
+			function performCommand(event) {
+				if (event.command == 'resizerActivate') {
+					if(resizerBar.visible == true) {
+						resizerBar.hide();
+					} else {
+						resizerBar.show();
+					}
+				} else if (event.command == 'resizeWindow') {
+					resizerBar.contentWindow.resizeWindow(event.target.identifier);
+				} else if (event.command == 'resizeMinus1') {
+					resizerBar.contentWindow.resizeMinus1();
+				} else if (event.command == 'resizePlus1') {
+					resizerBar.contentWindow.resizePlus1();
+				} else if (event.command == 'resizeFullScreen') {
+					resizerBar.contentWindow.resizeFullScreen();
+				}
+			}
+		</script>
+	</head>
+	<body>
+	</body>
+</html>
