@@ -17,7 +17,7 @@ Install
 =======
 
 Either download the [compiled
-extension](compiled)
+extension][compiled]
 and drag it into Safari, or clone the repo and add it as an extension
 from `Develop -> Show Extension Builder -> + (on the bottom left) -> Add
 Extension` and locate the downloaded repo.
